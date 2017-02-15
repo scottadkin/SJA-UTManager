@@ -5,12 +5,12 @@ Requires:
 - Node.js
 
 How to use:
-- Place main.js into your Unreal Tournament System folder.
+- Place SJA-UTManager.js into your Unreal Tournament System folder.
 - Open the command prompt.
-- type "node main.js"
+- type "node SJA-UTManager.js"
 or
 - Create a .bat file in the unreal Tournament System directory (run.bat)
-- Write "node main.js" (without the quotation marks) and the save.
+- Write "node SJA-UTManager.js" (without the quotation marks) and the save.
 - Double click run.bat.
 
 Examples of what it does:
