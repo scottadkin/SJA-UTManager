@@ -3,26 +3,6 @@ const fs = require("fs");
 const path = require("path");
 
 const CURRENT_DIR = __dirname;
-/*
-let test = fs.statSync("D3D9Drv.dll")
-
-let date = test.mtime;
-
-console.log("File was created at :"+date);
-
-let files = fs.readdirSync(currentDir);
-
-let demos = [];
-let sshots = [];
-*/
-// check demos size is no 0kb if it is don't move it because its the current demo being recorded to that file
-
-
-// ADD previous demo name at the end of the demo, so users know where their demos has been moved to.
-
-
-
-
 
 class UTManager{
 
@@ -51,17 +31,11 @@ class UTManager{
 
         this.foundCacheFolder = false;
 
-
         this.getFileList();
         this.sortFiles();
         this.moveFiles();
-
-
         this.getCacheList();
-        
-        
-
-        
+    
     }
 
 
@@ -513,18 +487,3 @@ class UTManager{
 
 
 const Test1 = new UTManager();
-
-
-//----------------------------------
-/*
-//current file
-let cf = "";
-
-fileIsA("test.bmp","bmp");
-
-for(let i = 0; i < files.length; i++){
-
-    cf = files[i];
-
-}
-*/
