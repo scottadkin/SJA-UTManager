@@ -3,6 +3,7 @@ SJA UTManager is a simple node.js program that organizes all your screenshots, d
 
 Requires:
 - Node.js
+- npm install --save jimp (https://github.com/oliver-moran/jimp)
 
 How to use:
 - Place SJA-UTManager.js into your Unreal Tournament System folder.
