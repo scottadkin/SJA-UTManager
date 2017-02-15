@@ -4,6 +4,7 @@ const path = require("path");
 
 const CURRENT_DIR = __dirname;
 
+
 class UTManager{
 
     constructor(){
@@ -31,11 +32,17 @@ class UTManager{
 
         this.foundCacheFolder = false;
 
+
         this.getFileList();
         this.sortFiles();
         this.moveFiles();
+
+
         this.getCacheList();
-    
+        
+        
+
+        
     }
 
 
@@ -261,9 +268,8 @@ class UTManager{
                     }
                 }else{
                     fs.createReadStream(this.sshots[i].name).pipe(fs.createWriteStream(this.home+"/Screenshots/"+this.sshots[i].dir+"/"+this.sshots[i].name));
-                    this.notice("Moving "+this.sshots[i].name+"\" to \""+this.sshots[i].dir+"/"+this.sshots[i].name+"\"");
+                    this.notice("Moving "+this.sshots[i].name+"\" to \""+this.sshots[i].dir+"/"+this.sshots[i].newname+".bmp\"");
                     fs.unlinkSync(this.sshots[i].name);
-                    this.notice("Deleting old file!");
                 }
             });        
         }
@@ -289,7 +295,6 @@ class UTManager{
                     fs.createReadStream(this.demos[i].name).pipe(fs.createWriteStream(this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name));
                     this.notice("Moving "+this.demos[i].name+"\" to \""+this.demos[i].dir+"/"+this.demos[i].name);    
                     fs.unlinkSync(this.demos[i].name);
-                    this.notice("Deleting old file!");
                 }
                 
             });           
@@ -487,3 +492,4 @@ class UTManager{
 
 
 const Test1 = new UTManager();
+
