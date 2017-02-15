@@ -1,8 +1,13 @@
 
 const fs = require("fs");
 const path = require("path");
+const jimp = require("jimp");
 
 const CURRENT_DIR = __dirname;
+
+
+
+
 
 
 class UTManager{
@@ -267,9 +272,20 @@ class UTManager{
                         this.error("Skipping file "+this.sshots[i].name);
                     }
                 }else{
-                    fs.createReadStream(this.sshots[i].name).pipe(fs.createWriteStream(this.home+"/Screenshots/"+this.sshots[i].dir+"/"+this.sshots[i].name));
-                    this.notice("Moving "+this.sshots[i].name+"\" to \""+this.sshots[i].dir+"/"+this.sshots[i].newname+".bmp\"");
-                    fs.unlinkSync(this.sshots[i].name);
+                    /*fs.createReadStream(this.sshots[i].name).pipe(fs.createWriteStream(this.home+"/Screenshots/"+this.sshots[i].dir+"/"+this.sshots[i].name));
+                    this.notice("Moving "+this.sshots[i].name+"\" to \""+this.sshots[i].dir+"/"+this.sshots[i].newname+".bmp\"");*/
+
+                    jimp.read(this.sshots[i].name).then((a) =>  {         // resize
+                            a.quality(100)                 // set JPEG quality                // set greyscale
+                            .write(this.home+"/Screenshots/"+this.sshots[i].dir+"/"+this.sshots[i].newname+".jpg"); // save
+
+                            fs.unlinkSync(this.sshots[i].name);
+                            this.notice("Converting  "+this.sshots[i].name+"\" to \""+this.sshots[i].dir+"/"+this.sshots[i].newname+".jpg\"");
+                    }).catch(function (err) {
+                        console.error(err);
+                    });
+                    
+                    
                 }
             });        
         }
