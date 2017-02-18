@@ -387,17 +387,19 @@ class UTManager{
                 let reg = new RegExp("(.+?)\r\n","gim");
             //    let reg = new RegExp("=","gim");
 
-                let a = data.match(reg);
+                if(reg.test(data)){
+                    let a = data.match(reg);
 
-                for(let i = 0; i < a.length; i++){
-                    a[i] = a[i].replace("\r\n","");
+                    for(let i = 0; i < a.length; i++){
+                        a[i] = a[i].replace("\r\n","");
+                    }
+
+                    this.cacheFileList = a;
+
+                    this.notice("Found "+(a.length-1)+" cache files to convert.");
+
+                    this.moveCacheFiles();
                 }
-
-                this.cacheFileList = a;
-
-                this.notice("Found "+(a.length-1)+" cache files to convert.");
-
-                this.moveCacheFiles();
             }
         });
     }
@@ -412,10 +414,21 @@ class UTManager{
                 folder = this.getFileTypeFolder(this.cacheIndex[i].file);
                 //convert File
                 this.getFileTypeFolder(this.cacheIndex[i].file);
-                this.notice("Converting ../Cache/"+this.cacheIndex[i].uxx+".uxx to "+folder+this.cacheIndex[i].file);
-                fs.createReadStream("../Cache/"+this.cacheIndex[i].uxx+".uxx").pipe(fs.createWriteStream(folder+this.cacheIndex[i].file));
-                fs.unlinkSync("../Cache/"+this.cacheIndex[i].uxx+".uxx");
-                return;
+
+                fs.open(this.cacheIndex[i].uxx+".uxx","r+",(err, stats) =>{
+
+                    if(err){
+                        if(err.code == "EBUSY"){
+                            this.error("../Cache/"+this.cacheIndex[i].uxx+".uxx is being used by another process!");
+                            this.error("Skipping "+this.cacheIndex[i].uxx+".uxx");
+                        }
+                    }else{
+                        this.notice("Converting ../Cache/"+this.cacheIndex[i].uxx+".uxx to "+folder+this.cacheIndex[i].file);
+                        fs.createReadStream("../Cache/"+this.cacheIndex[i].uxx+".uxx").pipe(fs.createWriteStream(folder+this.cacheIndex[i].file));
+                        fs.unlinkSync("../Cache/"+this.cacheIndex[i].uxx+".uxx");
+                        return;
+                    }
+                });
             }
         }
 
