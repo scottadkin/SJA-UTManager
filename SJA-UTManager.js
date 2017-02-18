@@ -7,9 +7,6 @@ const CURRENT_DIR = __dirname;
 
 
 
-
-
-
 class UTManager{
 
     constructor(){
@@ -297,23 +294,28 @@ class UTManager{
 
         for(let i = 0; i < this.demos.length; i++){
 
-            fs.open(this.demos[i].name,"r+",(err, stats) =>{
+            if(this.bValidName(this.demos[i].name)){
+                fs.open(this.demos[i].name,"r+",(err, stats) =>{
 
-                if(err){ 
+                    if(err){ 
 
-                    if(err.code == "EBUSY"){
-                        this.error("Failed to process "+this.demos[i].name+", the file is currently in use by another process!");
-                        this.error("Skipping file "+this.demos[i].name);
+                        if(err.code == "EBUSY"){
+                            this.error("Failed to process "+this.demos[i].name+", the file is currently in use by another process!");
+                            this.error("Skipping file "+this.demos[i].name);
+                        }
+
+                    }else{
+
+                        fs.createReadStream(this.demos[i].name).pipe(fs.createWriteStream(this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name));
+                        this.notice("Moving "+this.demos[i].name+"\" to \""+this.demos[i].dir+"/"+this.demos[i].name);    
+                        fs.unlinkSync(this.demos[i].name);
                     }
+                    
+                });    
+            }else{
+                this.error(this.demos[i].name + " filename contains illegal characters, Ignoring.");
+            }
 
-                }else{
-
-                    fs.createReadStream(this.demos[i].name).pipe(fs.createWriteStream(this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name));
-                    this.notice("Moving "+this.demos[i].name+"\" to \""+this.demos[i].dir+"/"+this.demos[i].name);    
-                    fs.unlinkSync(this.demos[i].name);
-                }
-                
-            });           
         }
     }
 
@@ -409,26 +411,29 @@ class UTManager{
         let folder = "";
 
         for(let i = 0; i < this.cacheIndex.length; i++){
+            if(this.bValidName(this.cacheIndex[i].file)){
+                if(this.cacheIndex[i].uxx == filename.replace(".uxx","")){
+                    folder = this.getFileTypeFolder(this.cacheIndex[i].file);
+                    //convert File
+                    this.getFileTypeFolder(this.cacheIndex[i].file);
 
-            if(this.cacheIndex[i].uxx == filename.replace(".uxx","")){
-                folder = this.getFileTypeFolder(this.cacheIndex[i].file);
-                //convert File
-                this.getFileTypeFolder(this.cacheIndex[i].file);
+                    fs.open(this.cacheIndex[i].uxx+".uxx","r+",(err, stats) =>{
 
-                fs.open(this.cacheIndex[i].uxx+".uxx","r+",(err, stats) =>{
-
-                    if(err){
-                        if(err.code == "EBUSY"){
-                            this.error("../Cache/"+this.cacheIndex[i].uxx+".uxx is being used by another process!");
-                            this.error("Skipping "+this.cacheIndex[i].uxx+".uxx");
+                        if(err){
+                            if(err.code == "EBUSY"){
+                                this.error("../Cache/"+this.cacheIndex[i].uxx+".uxx is being used by another process!");
+                                this.error("Skipping "+this.cacheIndex[i].uxx+".uxx");
+                            }
+                        }else{
+                            this.notice("Converting ../Cache/"+this.cacheIndex[i].uxx+".uxx to "+folder+this.cacheIndex[i].file);
+                            fs.createReadStream("../Cache/"+this.cacheIndex[i].uxx+".uxx").pipe(fs.createWriteStream(folder+this.cacheIndex[i].file));
+                            fs.unlinkSync("../Cache/"+this.cacheIndex[i].uxx+".uxx");
+                            return;
                         }
-                    }else{
-                        this.notice("Converting ../Cache/"+this.cacheIndex[i].uxx+".uxx to "+folder+this.cacheIndex[i].file);
-                        fs.createReadStream("../Cache/"+this.cacheIndex[i].uxx+".uxx").pipe(fs.createWriteStream(folder+this.cacheIndex[i].file));
-                        fs.unlinkSync("../Cache/"+this.cacheIndex[i].uxx+".uxx");
-                        return;
-                    }
-                });
+                    });
+                }
+            }else{
+                this.error(this.cacheIndex[i].name+" filename contains illegal characters, ignoring.");
             }
         }
 
@@ -457,6 +462,15 @@ class UTManager{
 
     }
 
+    bValidName(text){
+        let reg = /\'/i;
+
+        if(reg.test(text)){
+            return false;
+        }
+
+        return true;
+    }
 
     getFileTypeFolder(file){
 
