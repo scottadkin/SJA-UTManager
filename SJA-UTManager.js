@@ -52,7 +52,7 @@ class UTManager{
 
         console.log('\x1b[36m',"||--------------------------------------------------------------------||",'\x1b[0m');
         console.log('\x1b[36m',"||--------------------------------------------------------------------||",'\x1b[0m');
-        console.log('\x1b[36m',"||--------------- SJA UTManager Version 0.1 12.02.17 -----------------||",'\x1b[0m');
+        console.log('\x1b[36m',"||--------------- SJA UTManager Version 0.4a 21.02.17 -----------------||",'\x1b[0m');
         console.log('\x1b[36m',"||--------------------------------------------------------------------||",'\x1b[0m');
         console.log('\x1b[36m',"||--------------------------------------------------------------------||",'\x1b[0m');
     }
@@ -306,9 +306,26 @@ class UTManager{
 
                     }else{
 
-                        fs.createReadStream(this.demos[i].name).pipe(fs.createWriteStream(this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name));
+                        /*fs.createReadStream(this.demos[i].name).pipe(fs.createWriteStream(this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name));
                         this.notice("Moving "+this.demos[i].name+"\" to \""+this.demos[i].dir+"/"+this.demos[i].name);    
-                        fs.unlinkSync(this.demos[i].name);
+                        fs.unlinkSync(this.demos[i].name);*/
+
+                        fs.readFile(this.demos[i].name,(err, data) =>{
+
+                            if(err){
+                                this.error("Failed to move "+this.demos[i].name+" to "+this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name+" skipping.");
+                            }else{
+                                fs.writeFile(this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name,data.toString(), (err) =>{
+                                    if(err){
+                                        this.error("Failed to create "+this.home+"/Demos/"+this.demos[i].dir+"/"+this.demos[i].name+" skipping.");
+                                    }else{
+                                        this.notice("Moving "+this.demos[i].name+"\" to \""+this.demos[i].dir+"/"+this.demos[i].name);   
+                                        fs.unlink(this.demos[i].name);
+                                    }
+                                });
+                                
+                            }
+                        });
                     }
                     
                 });    
@@ -409,6 +426,7 @@ class UTManager{
     findAndConvertCacheFile(filename){
 
         let folder = "";
+        let currentFile = "";
 
         for(let i = 0; i < this.cacheIndex.length; i++){
             if(this.bValidName(this.cacheIndex[i].file)){
@@ -425,9 +443,20 @@ class UTManager{
                                 this.error("Skipping "+this.cacheIndex[i].uxx+".uxx");
                             }
                         }else{
-                            this.notice("Converting ../Cache/"+this.cacheIndex[i].uxx+".uxx to "+folder+this.cacheIndex[i].file);
-                            fs.createReadStream("../Cache/"+this.cacheIndex[i].uxx+".uxx").pipe(fs.createWriteStream(folder+this.cacheIndex[i].file));
-                            fs.unlinkSync("../Cache/"+this.cacheIndex[i].uxx+".uxx");
+                            
+
+                            currentFile = fs.readFile("../Cache/"+this.cacheIndex[i].uxx+".uxx",(err, data) =>{
+                                if(err){
+                                    this.error("Failed to convert "+"../Cache/"+this.cacheIndex[i].uxx+".uxx, skipping.");
+                                }else{
+                                    this.notice("Converting ../Cache/"+this.cacheIndex[i].uxx+".uxx to "+folder+this.cacheIndex[i].file);
+                                    fs.writeFile(folder+this.cacheIndex[i].file,data.toString());
+                                    fs.unlinkSync("../Cache/"+this.cacheIndex[i].uxx+".uxx");
+                                }
+                            });
+                            //fs.createReadStream("../Cache/"+this.cacheIndex[i].uxx+".uxx").pipe(fs.createWriteStream(folder+this.cacheIndex[i].file));
+                            //
+                           
                             return;
                         }
                     });
@@ -466,7 +495,7 @@ class UTManager{
         let reg = /\'/i;
 
         if(reg.test(text)){
-            return false;
+           // return false;
         }
 
         return true;
